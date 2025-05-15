@@ -6,7 +6,7 @@
     "tags": ["whole", "halved", "sliced", "mashed", "fruit"],
     "sizes": {
       "chopping_board": 1,
-      "bowl": 0.4
+      "bowl": 2
     },
     "states": [
       {"name": "whole", "image": "/images/avocado.png"},
