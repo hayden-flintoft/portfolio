@@ -1,24 +1,15 @@
 import React, { useState, useEffect } from 'react'
-
-// Define proper TypeScript interfaces
-interface Ingredient {
-  id: number
-  name: string
-  image: string
-  tags: string[]
-  states: string[]
-  defaultState: string
-}
+import { useIngredients } from '../context/IngredientsContext'
 
 interface InventoryProps {
-  ingredients: Ingredient[]
   className?: string
 }
 
-function Inventory({ ingredients, className }: InventoryProps) {
+function Inventory({ className }: InventoryProps) {
+  const { ingredients } = useIngredients();
   const [searchTerm, setSearchTerm] = useState('')
   const [activeFilters, setActiveFilters] = useState<string[]>([])
-  const [filteredIngredients, setFilteredIngredients] = useState<Ingredient[]>(ingredients)
+  const [filteredIngredients, setFilteredIngredients] = useState(ingredients)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   
   // Group ingredients by category for easier navigation
@@ -68,16 +59,9 @@ function Inventory({ ingredients, className }: InventoryProps) {
     )
   }
   
-  const handleDragStart = (e: React.DragEvent, ingredient: Ingredient) => {
+  const handleDragStart = (e: React.DragEvent, ingredient: any) => {
     // Make sure we send ALL data including the sizes property
-    const transferData = {
-      ...ingredient, // Include all properties
-      // Additional properties if needed
-    };
-    
-    console.log('Drag data being set:', transferData);
-    
-    e.dataTransfer.setData('application/json', JSON.stringify(transferData));
+    e.dataTransfer.setData('application/json', JSON.stringify(ingredient));
     e.dataTransfer.effectAllowed = 'copy';
     
     // Create a properly sized drag preview image
@@ -96,7 +80,6 @@ function Inventory({ ingredients, className }: InventoryProps) {
       // When the image loads, draw it to the canvas
       img.onload = () => {
         if (ctx) {
-          // Draw the image centered in the canvas
           ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, 80, 80);
           
           // Create a new image from the canvas
@@ -190,9 +173,7 @@ function Inventory({ ingredients, className }: InventoryProps) {
                   loading="lazy"
                   onError={(e) => {
                     console.error(`Failed to load image: ${ingredient.image}`);
-                    e.currentTarget.onerror = null; // Prevent infinite error loops
-                    
-                    // Use a more reliable placeholder service
+                    e.currentTarget.onerror = null;
                     e.currentTarget.src = `https://placehold.co/200x200/gray/white?text=${encodeURIComponent(ingredient.name)}`;
                   }}
                 />

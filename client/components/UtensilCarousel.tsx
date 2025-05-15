@@ -1,20 +1,15 @@
 import React from 'react'
-
-interface Utensil {
-  id: number
-  name: string
-  image: string
-  description: string
-}
+import { useKitchenItems } from '../context/KitchenItemsContext'
+import { useWorkspace } from '../context/WorkspaceContext'
 
 interface UtensilCarouselProps {
-  utensils: Utensil[]
-  setActiveUtensil: (utensil: Utensil | null) => void
-  activeUtensil: Utensil | null
   className?: string
 }
 
-function UtensilCarousel({ utensils, setActiveUtensil, activeUtensil, className }: UtensilCarouselProps) {
+function UtensilCarousel({ className }: UtensilCarouselProps) {
+  const { utensils } = useKitchenItems();
+  const { workspace, setUtensil } = useWorkspace();
+  
   return (
     <div className={`p-2 overflow-x-auto ${className}`}>
       <h3 className="text-sm font-semibold text-gray-500 px-2 mb-1">Utensils</h3>
@@ -23,18 +18,16 @@ function UtensilCarousel({ utensils, setActiveUtensil, activeUtensil, className 
           <div 
             key={item.id}
             className="flex-shrink-0 w-20 cursor-pointer group"
-            onClick={() => setActiveUtensil(activeUtensil?.id === item.id ? null : item)}
-            draggable="true"
+            onClick={() => setUtensil(item)}
+            draggable={true}
             onDragStart={(e) => {
               e.dataTransfer.setData('application/json', JSON.stringify({
-                type: 'utensil',
                 ...item
               }));
-              e.dataTransfer.effectAllowed = 'copy';
             }}
           >
             <div className={`aspect-square rounded overflow-hidden mb-1 border-2 ${
-              activeUtensil?.id === item.id ? 'border-green-500' : 'border-transparent'
+              workspace.utensil?.id === item.id ? 'border-green-500' : 'border-transparent'
             }`}>
               <img 
                 src={item.image} 

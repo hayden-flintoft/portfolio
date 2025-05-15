@@ -1,20 +1,15 @@
 import React from 'react'
-
-interface Cookware {
-  id: number
-  name: string
-  image: string
-  description: string
-}
+import { useKitchenItems } from '../context/KitchenItemsContext'
+import { useWorkspace } from '../context/WorkspaceContext'
 
 interface CookwareCarouselProps {
-  cookware: Cookware[]
-  setActiveCookware: (cookware: Cookware | null) => void
-  activeCookware: Cookware | null
   className?: string
 }
 
-function CookwareCarousel({ cookware, setActiveCookware, activeCookware, className }: CookwareCarouselProps) {
+function CookwareCarousel({ className }: CookwareCarouselProps) {
+  const { cookware } = useKitchenItems();
+  const { workspace, setCookware } = useWorkspace();
+  
   return (
     <div className={`p-2 overflow-x-auto ${className}`}>
       <h3 className="text-sm font-semibold text-gray-500 px-2 mb-1">Cookware</h3>
@@ -23,18 +18,10 @@ function CookwareCarousel({ cookware, setActiveCookware, activeCookware, classNa
           <div 
             key={item.id}
             className="flex-shrink-0 w-20 cursor-pointer group"
-            onClick={() => setActiveCookware(activeCookware?.id === item.id ? null : item)}
-            draggable="true"
-            onDragStart={(e) => {
-              e.dataTransfer.setData('application/json', JSON.stringify({
-                type: 'cookware',
-                ...item
-              }));
-              e.dataTransfer.effectAllowed = 'copy';
-            }}
+            onClick={() => setCookware(workspace.cookware?.id === item.id ? null : item)}
           >
             <div className={`aspect-square rounded overflow-hidden mb-1 border-2 ${
-              activeCookware?.id === item.id ? 'border-green-500' : 'border-transparent'
+              workspace.cookware?.id === item.id ? 'border-green-500' : 'border-transparent'
             }`}>
               <img 
                 src={item.image} 
