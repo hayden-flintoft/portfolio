@@ -27,8 +27,6 @@
   },
   "dependencies": {
     "express": "^4.17.2",
-    "knex": "^2.5.1",
-    "sqlite3": "^5.1.6",
     "superagent": "^8.1.2"
   },
   "devDependencies": {
@@ -62,7 +60,11 @@
     "tsx": "^3.12.7",
     "typescript": "^5.3.3",
     "vite": "^5.0.0",
-    "vitest": "^1.2.0"
+    "vitest": "^1.2.0",
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.38",
+    "autoprefixer": "^10.4.16",
+    "ts-node": "^10.9.1"
   },
   "prettier": {
     "semi": false,

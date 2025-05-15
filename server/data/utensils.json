@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Knife",
+    "image": "/images/knife.png",
+    "description": "For cutting ingredients",
+    "type": "utensil",
+    "actions": ["slice", "dice", "chop"],
+    "compatibleWith": ["chopping_board"]
+  },
+  {
+    "id": 2,
+    "name": "Fork",
+    "image": "/images/fork.png",
+    "description": "For mashing ingredients",
+    "type": "utensil",
+    "actions": ["mash"],
+    "compatibleWith": ["bowl"]
+  }
+]

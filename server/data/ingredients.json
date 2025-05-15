@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "name": "Avocado",
+    "image": "/images/avocado.png",
+    "tags": ["whole", "halved", "sliced", "mashed", "fruit"],
+    "sizes": {
+      "chopping_board": 1,
+      "bowl": 0.4
+    },
+    "states": [
+      {"name": "whole", "image": "/images/avocado.png"},
+      {"name": "halved", "image": "/images/avocado_halved.png"},
+      {"name": "sliced", "image": "/images/avocado_sliced.png"},
+      {"name": "mashed", "image": "/images/avocado_mashed.png"}
+    ],
+    "defaultState": "whole",
+    "allowedActions": {
+      "slice": {
+        "from": "whole",
+        "to": "halved"
+      },
+      "chop": {
+        "from": "halved",
+        "to": "sliced"
+      },
+      "mash": {
+        "from": ["halved", "sliced"],
+        "to": "mashed"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "name": "Tomato",
+    "image": "/images/tomato.png",
+    "tags": ["whole", "sliced", "vegetable"],
+    "sizes": {
+      "chopping_board": 0.45,
+      "bowl": 0.35
+    },
+    "states": [
+      {"name": "whole", "image": "/images/tomato.png"},
+      {"name": "sliced", "image": "/images/tomato_sliced.png"},
+      {"name": "diced", "image": "/images/tomato_diced.png"}
+    ],
+    "defaultState": "whole",
+    "allowedActions": {
+      "slice": {
+        "from": "whole",
+        "to": "sliced"
+      },
+      "dice": {
+        "from": "sliced",
+        "to": "diced"
+      }
+    }
+  },
+  {
+    "id": 3,
+    "name": "Lime",
+    "image": "/images/lime.png",
+    "tags": ["whole", "sliced", "fruit", "citrus"],
+    "states": [
+      {"name": "whole", "image": "/images/lime.png"},
+      {"name": "sliced", "image": "/images/lime_sliced.png"}
+    ],
+    "defaultState": "whole"
+  },
+  {
+    "id": 4,
+    "name": "Red Onion",
+    "image": "/images/red_onion.png",
+    "tags": ["whole", "sliced", "vegetable"],
+    "states": [
+      {"name": "whole", "image": "/images/red_onion.png"},
+      {"name": "sliced", "image": "/images/red_onion_sliced.png"},
+      {"name": "diced", "image": "/images/red_onion_diced.png"}
+    ],
+    "defaultState": "whole"
+  },
+  {
+    "id": 5,
+    "name": "Salt",
+    "image": "/images/salt.png",
+    "tags": ["seasoning", "condiment"],
+    "states": [
+      {"name": "ground", "image": "/images/salt.png"}
+    ],
+    "defaultState": "ground"
+  }
+]

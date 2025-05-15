@@ -1,0 +1,32 @@
+portfolio/
+│
+├── client/                        # Frontend code
+│   ├── apis/                      # API client modules
+│   │   └── fruits.ts              # Client for fruits API
+│   ├── components/                
+│   │   └── App.tsx                # Main React component
+│   ├── hooks/                     
+│   │   └── useFruits.ts           # React Query hooks for fruits
+│   ├── styles/                   
+│   │   └── index.scss             # Main stylesheet with imports
+│   └── index.tsx                  # React entry point
+│
+├── models/                        # Shared type definitions
+│   └── fruit.ts                   # Fruit interface definitions
+│
+├── server/                        # Backend code
+│   ├── db/                        # Database modules
+│   │   └── fruits.js              # (referenced but not shown in files)
+│   ├── routes/                    
+│   │   └── fruits.ts              # Express routes for fruits API
+│   ├── index.ts                   # Server entry point
+│   └── server.ts                  # Express server setup
+│
+├── dist/                          # Build output directory (gitignored)
+│
+├── index.html                     # HTML entry point
+├── package.json                   # Project dependencies and scripts
+├── tsconfig.json                  # TypeScript configuration
+├── vite.config.js                 # Vite configuration
+├── .gitignore                     # Git ignore rules
+└── README.md                      # Project documentation

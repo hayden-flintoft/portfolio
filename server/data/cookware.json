@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Bowl",
+    "image": "/images/bowl.png",
+    "description": "For mixing ingredients",
+    "type": "cookware",
+    "acceptsStates": ["all"],
+    "compatibleUtensils": ["fork", "spoon"],
+    "allowedActions": ["mix", "mash"]
+  },
+  {
+    "id": 2,
+    "name": "Chopping Board",
+    "image": "/images/chopping_board.png",
+    "description": "For cutting ingredients",
+    "type": "cookware",
+    "acceptsStates": ["whole", "halved"],
+    "compatibleUtensils": ["knife"],
+    "allowedActions": ["slice", "dice", "chop"]
+  }
+]
