@@ -9,6 +9,7 @@ export interface Cookware {
   acceptsStates: string[];
   compatibleUtensils: string[];
   allowedActions: string[];
+  centersIngredients?: boolean;
 }
 
 export interface Utensil {
