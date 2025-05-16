@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useWorkspace } from '../context/WorkspaceContext'
 import { useIngredients } from '../context/IngredientsContext'
 
@@ -7,11 +7,28 @@ interface WorkspaceProps {
 }
 
 function Workspace({ className }: WorkspaceProps) {
-  const { workspace, addIngredient, updateIngredientState, removeIngredient, setUtensil } = useWorkspace();
+  const { workspace, addIngredient, updateIngredientState, removeIngredient, setUtensil, setCookware } = useWorkspace();
   const { addProcessedIngredient } = useIngredients();
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [workspaceSize, setWorkspaceSize] = useState({ width: 0, height: 0 });
+  
+  // Track workspace size
+  useEffect(() => {
+    if (workspaceRef.current) {
+      const updateSize = () => {
+        setWorkspaceSize({
+          width: workspaceRef.current!.clientWidth,
+          height: workspaceRef.current!.clientHeight
+        });
+      };
+      
+      updateSize();
+      window.addEventListener('resize', updateSize);
+      return () => window.removeEventListener('resize', updateSize);
+    }
+  }, []);
   
   // Handle drag over for the workspace
   const handleDragOver = (e: React.DragEvent) => {
@@ -19,7 +36,25 @@ function Workspace({ className }: WorkspaceProps) {
     e.dataTransfer.dropEffect = 'copy';
   };
   
-  // Handle drop for new items
+  // Get positioning based on cookware settings and workspace size
+  const getIngredientPosition = (x: number, y: number) => {
+    if (!workspace.cookware) {
+      return { x, y };
+    }
+    
+    // If cookware centers ingredients, use the center of workspace
+    if (workspace.cookware.centersIngredients) {
+      return {
+        x: workspaceSize.width / 2,
+        y: workspaceSize.height / 2
+      };
+    }
+        
+    // Default: return the original coordinates
+    return { x, y };
+  };
+  
+  // Handle drop for new items - FIXED to handle all item types
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     
@@ -32,30 +67,53 @@ function Workspace({ className }: WorkspaceProps) {
       }
       
       const droppedItem = JSON.parse(data);
-      const rect = workspaceRef.current!.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      console.log('Drop event received with data:', droppedItem);
       
-      // If no type, assume it's an ingredient
-      if (!droppedItem.type) {
-        if (!workspace.cookware) {
-          console.log('Please add a cookware first');
-          return;
-        }
-        
-        // Check if the cookware accepts this ingredient state
-        const ingredientState = droppedItem.defaultState || 'whole';
-        if (!workspace.cookware.acceptsStates.includes(ingredientState) && 
-            !workspace.cookware.acceptsStates.includes('all')) {
-          console.log(`This cookware doesn't accept ${ingredientState} ingredients`);
-          return;
-        }
-        
-        // Add the ingredient to the workspace
-        addIngredient(droppedItem, x, y);
+      // Rest of the handler code...
+      
+      // For cookware, be more explicit:
+      if (droppedItem.type === 'cookware') {
+        console.log('Setting cookware:', droppedItem);
+        setCookware(droppedItem);
+        return;
       }
+      
+      const rect = workspaceRef.current!.getBoundingClientRect();
+      
+      // Get raw drop coordinates
+      const rawX = e.clientX - rect.left;
+      const rawY = e.clientY - rect.top;
+      
+      console.log('Dropped item:', droppedItem);
+      
+      // Handle utensil items
+      if (droppedItem.type === 'utensil') {
+        setUtensil(droppedItem);
+        return;
+      }
+      
+      // Otherwise assume it's an ingredient
+      if (!workspace.cookware) {
+        console.log('Please add a cookware first');
+        return;
+      }
+      
+      // Check if the cookware accepts this ingredient state
+      const ingredientState = droppedItem.defaultState || 'whole';
+      if (!workspace.cookware.acceptsStates.includes(ingredientState) && 
+          !workspace.cookware.acceptsStates.includes('all')) {
+        console.log(`This cookware doesn't accept ${ingredientState} ingredients`);
+        return;
+      }
+      
+      // Get the position based on cookware settings
+      const { x, y } = getIngredientPosition(rawX, rawY);
+      
+      // Add the ingredient to the workspace
+      addIngredient(droppedItem, x, y);
     } catch (error) {
       console.error('Failed to parse dropped item:', error);
+      console.error('Raw data:', e.dataTransfer.getData('application/json'));
     }
   };
   
@@ -310,7 +368,7 @@ function Workspace({ className }: WorkspaceProps) {
         </>
       )}
     </div>
-  )
+  );
 }
 
-export default Workspace
+export default Workspace;
