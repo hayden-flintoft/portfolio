@@ -6,9 +6,10 @@
     "description": "For mixing ingredients",
     "type": "cookware",
     "acceptsStates": ["all"],
-    "compatibleUtensils": ["fork", "spoon"],
-    "allowedActions": ["mix", "mash"],
-    "centersIngredients": true
+    "compatibleUtensils": ["fork", "spoon", "hands"],
+    "allowedActions": ["knead", "mash", "juice", "squeeze"],
+    "centersIngredients": true,
+    "clearBeforeAdd": false
   },
   {
     "id": 2,
@@ -16,9 +17,10 @@
     "image": "/images/chopping_board.png",
     "description": "For cutting ingredients",
     "type": "cookware",
-    "acceptsStates": ["whole", "halved"],
-    "compatibleUtensils": ["knife"],
+    "acceptsStates": ["all"],
+    "compatibleUtensils": ["knife", "hands"],
     "allowedActions": ["slice", "dice", "chop"],
-    "centersIngredients": false
+    "centersIngredients": false,
+    "clearBeforeAdd": true
   }
 ]

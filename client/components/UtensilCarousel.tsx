@@ -19,11 +19,11 @@ function UtensilCarousel({ className }: UtensilCarouselProps) {
             key={item.id}
             className="flex-shrink-0 w-20 cursor-pointer group"
             onClick={() => setUtensil(item)}
-            draggable={true}
-            onDragStart={(e) => {
-              e.dataTransfer.setData('application/json', JSON.stringify({
-                ...item
-              }));
+            draggable={false} // Change to false - no dragging
+            onDragStart={(e) => e.preventDefault()} // Prevent drag
+            onTouchStart={(e) => {
+              e.stopPropagation();
+              setUtensil(item); // Just set the utensil directly
             }}
           >
             <div className={`aspect-square rounded overflow-hidden mb-1 border-2 ${
@@ -33,11 +33,7 @@ function UtensilCarousel({ className }: UtensilCarouselProps) {
                 src={item.image} 
                 alt={item.name}
                 className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
-                onError={(e) => {
-                  console.error(`Failed to load image: ${item.image}`);
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = `https://placehold.co/200x200/gray/white?text=${encodeURIComponent(item.name)}`;
-                }}
+                draggable={false}
               />
             </div>
             <p className="text-center text-sm truncate">{item.name}</p>

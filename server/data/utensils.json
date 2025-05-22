@@ -1,5 +1,14 @@
 [
   {
+    "id": 0,
+    "name": "Hands",
+    "image": "/images/hands.png",
+    "description": "For basic food handling",
+    "type": "utensil",
+    "actions": ["squeeze", "knead", "sprinkle"],
+    "compatibleWith": ["bowl", "chopping_board"]
+  },
+  {
     "id": 1,
     "name": "Knife",
     "image": "/images/knife.png",
