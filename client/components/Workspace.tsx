@@ -62,15 +62,13 @@ function Workspace({ className }: WorkspaceProps) {
       const data = e.dataTransfer.getData('application/json');
       
       if (!data) {
-        console.error('No data received in drop event');
+        console.warn('No data received in drop event');
         return;
       }
       
       const droppedItem = JSON.parse(data);
       console.log('Drop event received with data:', droppedItem);
-      
-      // Rest of the handler code...
-      
+
       // For cookware, be more explicit:
       if (droppedItem.type === 'cookware') {
         console.log('Setting cookware:', droppedItem);
@@ -97,13 +95,24 @@ function Workspace({ className }: WorkspaceProps) {
         console.log('Please add a cookware first');
         return;
       }
-      
+
       // Check if the cookware accepts this ingredient state
       const ingredientState = droppedItem.defaultState || 'whole';
       if (!workspace.cookware.acceptsStates.includes(ingredientState) && 
           !workspace.cookware.acceptsStates.includes('all')) {
         console.log(`This cookware doesn't accept ${ingredientState} ingredients`);
         return;
+      }
+      
+      // If cookware requires clearing before adding new ingredients
+      if (workspace.cookware.clearBeforeAdd) {
+        // Save existing ingredients to processed list
+        workspace.ingredients.forEach(ingredient => {
+          addProcessedIngredient(ingredient);
+        });
+        
+        // Clear the workspace ingredients
+        workspace.ingredients = [];
       }
       
       // Get the position based on cookware settings
@@ -145,74 +154,77 @@ function Workspace({ className }: WorkspaceProps) {
     
     // Create transparent drag image
     const img = new Image();
-    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // TODO: remove encoded image
     e.dataTransfer.setDragImage(img, 0, 0);
   };
   
-  // Handle ingredient click with utensil
+  // Update the handleIngredientClick function
   const handleIngredientClick = (e: React.MouseEvent, ingredient: any) => {
-    if (!workspace.utensil || !workspace.cookware) return;
-    
-    // Check compatibility
+    if (!workspace.cookware) return;
+
+    console.log('Ingredient clicked:', ingredient);
+    console.log('Current utensil:', workspace.utensil);
+    console.log('Current cookware:', workspace.cookware);
+
+    // Special case for juicing lime in bowl using hands (no utensil)
+    if (
+      ingredient.name === 'Lime' && 
+      ingredient.state === 'sliced' && 
+      workspace.cookware.name === 'Bowl' &&
+      !workspace.utensil // Only when using hands (no utensil)
+    ) {
+      console.log('Juicing lime in bowl with hands');
+      updateIngredientState(
+        ingredient.instanceId,
+        'juiced',
+        '/images/lime_juiced.png'
+      );
+      return;
+    }
+
+    // If no utensil selected, use hands
+    if (!workspace.utensil) return;
+
+    // Rest of existing click handler...
     const isCompatible = workspace.utensil.compatibleWith.includes(
       workspace.cookware.name.toLowerCase().replace(/\s+/g, '_')
     );
-    
+
     if (!isCompatible) {
       console.log(`This utensil can't be used with ${workspace.cookware.name}`);
       return;
     }
-    
+
     // Find applicable action
     const currentState = ingredient.state || 'whole';
     const availableActions = workspace.utensil.actions;
-    
+
+    console.log('Current state:', currentState);
+    console.log('Available actions:', availableActions);
+
     for (const action of availableActions) {
       const actionRules = ingredient.allowedActions?.[action];
-      
+
       if (!actionRules) continue;
-      
-      const canPerform = Array.isArray(actionRules.from) 
+
+      const canPerform = Array.isArray(actionRules.from)
         ? actionRules.from.includes(currentState)
         : actionRules.from === currentState;
-      
+
+      console.log(`Checking action: ${action}`, { canPerform, actionRules });
+
       if (canPerform) {
         const nextState = actionRules.to;
-        const nextStateObj = ingredient.states.find((state: any) => 
-          typeof state === 'object' && state.name === nextState
+
+        console.log(`Performing action: ${action}, transitioning to state: ${nextState}`);
+
+        // Update state in workspace
+        updateIngredientState(
+          ingredient.instanceId,
+          nextState,
+          `/images/${ingredient.name.toLowerCase()}_${nextState}.png`
         );
-        
-        if (nextStateObj) {
-          // Update state in workspace
-          updateIngredientState(
-            ingredient.instanceId, 
-            nextState,
-            nextStateObj.image
-          );
-          
-          // Add processed ingredient to inventory
-          const processedIngredient = {
-            ...ingredient,
-            id: Date.now(), // New ID for processed item
-            defaultState: nextState,
-            image: nextStateObj.image
-          };
-          
-          addProcessedIngredient(processedIngredient);
-          
-          // Play sound effect
-          const soundMap: Record<string, string> = {
-            'slice': 'knife-cutting.mp3',
-            'dice': 'knife-chopping.mp3',
-            'chop': 'knife-chopping.mp3',
-            'mash': 'mashing.mp3',
-            'mix': 'mixing.mp3'
-          };
-          
-          const audio = new Audio(`/sounds/${soundMap[action] || 'action.mp3'}`);
-          audio.play().catch(err => console.log('Audio playback failed', err));
-          break;
-        }
+        break;
       }
     }
   };
@@ -272,10 +284,19 @@ function Workspace({ className }: WorkspaceProps) {
     return BASE_SIZE * sizeMultiplier;
   };
 
+  // Add this to your Workspace component
+  const handleTouchStart = (e: React.TouchEvent, ingredient: any) => {
+    // Skip if utensil is active - we want to use click instead
+    if (workspace.utensil) return;
+    
+    // Otherwise handle touch like a click for non-drag operations
+    handleIngredientClick(e as unknown as React.MouseEvent, ingredient);
+  };
+
   return (
     <div 
       ref={workspaceRef}
-      className={`relative ${className}`}
+      className={`relative workspace-container ${className}`} // Add this class
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       onClick={handleWorkspaceClick}
@@ -299,7 +320,7 @@ function Workspace({ className }: WorkspaceProps) {
           </div>
           
           {/* Ingredients on the cookware */}
-          {workspace.ingredients.map(item => (
+          {workspace.ingredients.map((item) => (
             <div
               key={item.instanceId}
               data-instance-id={item.instanceId}
@@ -307,14 +328,13 @@ function Workspace({ className }: WorkspaceProps) {
               style={{
                 left: `${item.x}px`,
                 top: `${item.y}px`,
-                zIndex: draggingId === item.instanceId ? 30 : 20,
-                opacity: draggingId === item.instanceId ? 0.8 : 1,
-                cursor: workspace.utensil ? 'pointer' : 'grab'
+                zIndex: 20,
+                cursor: workspace.utensil ? 'pointer' : 'grab', // Show pointer cursor when utensil is active
+                touchAction: workspace.utensil ? 'auto' : 'none' // Only use drag behavior when no utensil
               }}
-              draggable={!workspace.utensil}
+              draggable={!workspace.utensil} // Only draggable when no utensil is active
               onDragStart={(e) => !workspace.utensil && handleIngredientDragStart(e, item.instanceId)}
-              onDragEnd={(e) => !workspace.utensil && handleDragEnd(e, item.instanceId)}
-              onClick={(e) => handleIngredientClick(e, item)}
+              onClick={(e) => handleIngredientClick(e, item)} // Always handle clicks for utensil actions
             >
               <img
                 src={item.image}
@@ -358,11 +378,9 @@ function Workspace({ className }: WorkspaceProps) {
           <div className="absolute bottom-4 left-0 w-full text-center">
             <h3 className="text-lg font-semibold bg-white bg-opacity-70 mx-auto py-1 px-3 rounded inline-block">
               {workspace.cookware.name}
-              {workspace.utensil && (
-                <span className="ml-2 text-red-500">
-                  (Using {workspace.utensil.name} - Click on ingredients)
-                </span>
-              )}
+              <span className="ml-2 text-gray-500">
+                (Using {workspace.utensil ? workspace.utensil.name : 'Hands'})
+              </span>
             </h3>
           </div>
         </>

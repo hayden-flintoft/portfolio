@@ -8,11 +8,12 @@
       "chopping_board": 1,
       "bowl": 2
     },
+    "stateOrder": ["whole", "halved", "sliced", "mashed"],
     "states": [
-      {"name": "whole", "image": "/images/avocado.png"},
-      {"name": "halved", "image": "/images/avocado_halved.png"},
-      {"name": "sliced", "image": "/images/avocado_sliced.png"},
-      {"name": "mashed", "image": "/images/avocado_mashed.png"}
+      {"name": "whole", "image": "/images/avocado.png", "label": "Whole"},
+      {"name": "halved", "image": "/images/avocado_halved.png", "label": "Halved"},
+      {"name": "sliced", "image": "/images/avocado_sliced.png", "label": "Sliced"},
+      {"name": "mashed", "image": "/images/avocado_mashed.png", "label": "Mashed"}
     ],
     "defaultState": "whole",
     "allowedActions": {
@@ -34,15 +35,16 @@
     "id": 2,
     "name": "Tomato",
     "image": "/images/tomato.png",
-    "tags": ["whole", "sliced", "vegetable"],
+    "tags": ["whole", "sliced", "diced", "vegetable"],
     "sizes": {
-      "chopping_board": 0.45,
-      "bowl": 0.35
+      "chopping_board": 1,
+      "bowl": 2
     },
+    "stateOrder": ["whole", "sliced", "diced"],
     "states": [
-      {"name": "whole", "image": "/images/tomato.png"},
-      {"name": "sliced", "image": "/images/tomato_sliced.png"},
-      {"name": "diced", "image": "/images/tomato_diced.png"}
+      {"name": "whole", "image": "/images/tomato.png", "label": "Whole"},
+      {"name": "sliced", "image": "/images/tomato_sliced.png", "label": "Sliced"},
+      {"name": "diced", "image": "/images/tomato_diced.png", "label": "Diced"}
     ],
     "defaultState": "whole",
     "allowedActions": {
@@ -60,33 +62,80 @@
     "id": 3,
     "name": "Lime",
     "image": "/images/lime.png",
-    "tags": ["whole", "sliced", "fruit", "citrus"],
+    "tags": ["whole", "sliced", "juiced", "fruit", "citrus"],
+    "sizes": {
+      "chopping_board": 1,
+      "bowl": 2
+    },
+    "stateOrder": ["whole", "sliced", "juiced"],
     "states": [
-      {"name": "whole", "image": "/images/lime.png"},
-      {"name": "sliced", "image": "/images/lime_sliced.png"}
+      {"name": "whole", "image": "/images/lime.png", "label": "Whole"},
+      {"name": "sliced", "image": "/images/lime_sliced.png", "label": "Sliced"},
+      {"name": "juiced", "image": "/images/lime_juiced.png", "label": "Juiced"}
     ],
-    "defaultState": "whole"
+    "defaultState": "whole",
+    "allowedActions": {
+      "slice": {
+        "from": "whole",
+        "to": "sliced"
+      },
+      "squeeze": {
+        "from": "sliced",
+        "to": "juiced"
+      }
+    }
   },
   {
     "id": 4,
-    "name": "Red Onion",
+    "name": "Red_Onion",
     "image": "/images/red_onion.png",
-    "tags": ["whole", "sliced", "vegetable"],
+    "tags": ["whole", "sliced", "diced", "vegetable"],
+    "sizes": {
+      "chopping_board": 1,
+      "bowl": 2
+    },
+    "stateOrder": ["whole", "sliced", "diced"],
     "states": [
-      {"name": "whole", "image": "/images/red_onion.png"},
-      {"name": "sliced", "image": "/images/red_onion_sliced.png"},
-      {"name": "diced", "image": "/images/red_onion_diced.png"}
+      {"name": "whole", "image": "/images/red_onion.png", "label": "Whole"},
+      {"name": "sliced", "image": "/images/red_onion_sliced.png", "label": "Sliced"},
+      {"name": "diced", "image": "/images/red_onion_diced.png", "label": "Diced"}
     ],
-    "defaultState": "whole"
+    "defaultState": "whole",
+    "allowedActions": {
+      "slice": {
+        "from": "whole",
+        "to": "sliced"
+      },
+      "chop": {
+        "from": "sliced",
+        "to": "diced"
+      }
+    }
   },
   {
     "id": 5,
     "name": "Salt",
     "image": "/images/salt.png",
     "tags": ["seasoning", "condiment"],
+    "sizes": {
+      "chopping_board": 0.3,
+      "bowl": 0.5
+    },
+    "stateOrder": ["ground"],
     "states": [
-      {"name": "ground", "image": "/images/salt.png"}
+      {
+        "name": "ground", 
+        "image": "/images/salt.png",
+        "workspaceImage": "/images/salt_heap.png",
+        "label": "Ground"
+      }
     ],
-    "defaultState": "ground"
+    "defaultState": "ground",
+    "allowedActions": {
+      "sprinkle": {
+        "from": "ground",
+        "to": "ground"
+      }
+    }
   }
 ]

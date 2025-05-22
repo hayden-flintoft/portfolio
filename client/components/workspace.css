@@ -1,0 +1,8 @@
+.utensil-active .ingredient-item {
+  cursor: pointer !important;
+}
+
+.utensil-active {
+  /* Replace with a standard cursor since custom image is missing */
+  cursor: crosshair;
+}
